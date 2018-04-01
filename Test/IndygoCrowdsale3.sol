@@ -18,11 +18,10 @@ pragma solidity ^0.4.17;
         }
     }
     
-    
-
 
 interface token {
     function mint(address receiver, uint amount) external;
+    function transferOwnership(address) external;
     
 }
 
@@ -100,14 +99,6 @@ contract Crowdsale is owned{
 
       event Closed();
 
-  /**
-   * @dev Reverts if not in crowdsale time range. 
-   */
-  modifier onlyWhileOpen {
-    require(now >= openingTime && now <= closingTime);
-    _;
-  }
-
       /**
    * @dev Constructor, takes crowdsale opening and closing times.
    * @param _openingTime Crowdsale opening time
@@ -141,8 +132,7 @@ contract Crowdsale is owned{
         address ownerOfCrowdsale
     ) public {
         beneficiary = ifSuccessfulSendTo;
-        fundingGoal = fundingGoalInEthers * 1 ether;
-        closingTime;
+        fundingGoal = fundingGoalInEthers;
         tokenReward = token(addressOfTokenUsedAsReward);
         crowdsaleOwner = ownerOfCrowdsale;
     }
@@ -205,7 +195,7 @@ contract Crowdsale is owned{
         uint256 rateAmount = getCurrentRate();
         uint256 amount = msg.value;
         balanceOf[msg.sender] += amount;
-        amountRaised += amount * 1 ether;
+        amountRaised += amount;
         tokenReward.mint(msg.sender, amount / rateAmount);
         tokenReward.mint(beneficiary, amount / rateAmount);
         emit FundTransfer(msg.sender, amount, true);
@@ -224,7 +214,7 @@ contract Crowdsale is owned{
     return amountRaised >= fundingGoal;
   }
    
-    
+   
      /**
      * Withdraw the funds
      *
@@ -232,27 +222,20 @@ contract Crowdsale is owned{
      * sends the entire amount to the beneficiary. If goal was not reached, each contributor can withdraw
      * the amount they contributed.
      */
-    function safeWithdrawal() afterDeadline public {
+    function safeWithdrawal() public afterDeadline {
         if (!fundingGoalReached) {
             uint amount = balanceOf[msg.sender];
             balanceOf[msg.sender] = 0;
             if (amount > 0) {
                 if (msg.sender.send(amount)) {
-                  emit FundTransfer(msg.sender, amount, false);
+                    emit FundTransfer(msg.sender, amount, false);
                 } else {
                     balanceOf[msg.sender] = amount;
                 }
             }
         }
-
-        if (fundingGoalReached && beneficiary == msg.sender) {
-            if (beneficiary.send(amountRaised)) {
-                emit FundTransfer(beneficiary, amountRaised, false);
-            } else {
-                //If we fail to send the funds to beneficiary, unlock funders balance
-                fundingGoalReached = false;
-            }
-        }
+        
     }
     
+
 }
