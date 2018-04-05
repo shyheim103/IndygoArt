@@ -5,8 +5,6 @@ import "./RefundableCrowdsale.sol";
 import "./MintedCrowdsale.sol";
 
 
-
-
 /**
  * @title SampleCrowdsale
  * @dev This is an example of a fully fledged crowdsale.
@@ -18,10 +16,10 @@ import "./MintedCrowdsale.sol";
  * After adding multiple features it's good practice to run integration tests
  * to ensure that subcontracts works together as intended.
  */
-contract SampleCrowdsale is IncreasingPriceCrowdsale, RefundableCrowdsale, MintedCrowdsale {
+contract IndygoCrowdsale is IncreasingPriceCrowdsale, RefundableCrowdsale, MintedCrowdsale {
     address public crowdsaleOwner;
 
-  function SampleCrowdsale(
+  function IndygoCrowdsale(
     uint256 _openingTime,
     uint256 _closingTime,
     uint256 _initialRate,
