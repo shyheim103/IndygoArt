@@ -1,5 +1,7 @@
 pragma solidity ^0.4.18;
 
+import "./SafeMath.sol";
+
 // Uses Pausible
 // Uses ownable 
 // Uses burnable
@@ -7,93 +9,22 @@ pragma solidity ^0.4.18;
 // Uses safemath
 // Uses mintable
 
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Owned {
-  address public owner;
+    contract owned {
+        address public owner;
 
+        function owned() public {
+            owner = msg.sender;
+        }
 
-  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+        modifier onlyOwner {
+            require(msg.sender == owner);
+            _;
+        }
 
-
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  function Owned() public {
-    owner = msg.sender;
-  }
-
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));
-    emit OwnershipTransferred(owner, newOwner);
-    owner = newOwner;
-  }
-
-}
-
-
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-library SafeMath {
-
-  /**
-  * @dev Multiplies two numbers, throws on overflow.
-  */
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
+        function transferOwnership(address newOwner) public onlyOwner {
+            owner = newOwner;
+        }
     }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
-
-  /**
-  * @dev Integer division of two numbers, truncating the quotient.
-  */
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
-
-  /**
-  * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
-
-  /**
-  * @dev Adds two numbers, throws on overflow.
-  */
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
-
 
 
 /**
@@ -103,7 +34,7 @@ library SafeMath {
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract HamCoin is Owned {
+contract HamCoin is owned {
     using SafeMath for uint256;
     // Public variables of the token
     string public name;
@@ -148,8 +79,6 @@ contract HamCoin is Owned {
     require(paused);
     _;
   }
-    
-    
     
 
  /**
@@ -300,4 +229,3 @@ contract HamCoin is Owned {
     emit Transfer(burner, address(0), _value);
   }
 }
-
