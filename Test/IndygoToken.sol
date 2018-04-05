@@ -34,7 +34,7 @@ import "./SafeMath.sol";
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract HamCoin is owned {
+contract Indygo is owned {
     using SafeMath for uint256;
     // Public variables of the token
     string public name;
@@ -86,12 +86,12 @@ contract HamCoin is owned {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function HamCoin(
+    function Indygo(
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol,
         address centralMinter
-    ) HamCoin(initialSupply, tokenName, tokenSymbol, centralMinter) public {
+    ) Indygo(initialSupply, tokenName, tokenSymbol, centralMinter) public {
         if(centralMinter != 0 ) owner = centralMinter;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
