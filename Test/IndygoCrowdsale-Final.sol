@@ -25,7 +25,7 @@ contract IndygoCrowdsale is IncreasingPriceCrowdsale, RefundableCrowdsale, Minte
     uint256 _initialRate,
     uint256 _finalRate,
     address _wallet,
-    HamCoin _token,
+    Indygo _token,
     uint256 _goal,
     address ownerOfCrowdsale
   )
