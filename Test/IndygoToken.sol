@@ -189,8 +189,6 @@ contract IntraCoin is owned {
       require(balanceOf[_to] + _value > balanceOf[_to]);  //Check for overflows
       
     _transfer(msg.sender, _to, _value);
-    
-    
   }
     
     
@@ -214,7 +212,6 @@ contract IntraCoin is owned {
     balanceOf[_to] += _value;
     emit Transfer(_from, _to, _value);
     return true;
-    
   }
 
   
