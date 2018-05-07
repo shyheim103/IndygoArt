@@ -12,7 +12,7 @@ import "./SafeMath.sol";
     contract owned {
         address public owner;
 
-        function owned() public {
+        constructor() public {
             owner = msg.sender;
         }
 
@@ -34,12 +34,13 @@ import "./SafeMath.sol";
  * @dev https://github.com/ethereum/EIPs/issues/20
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
-contract Indygo is owned {
+contract IntraCoin is owned {
     using SafeMath for uint256;
+    
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 18;    // 18 decimals is the strongly suggested default, avoid changing it
+    uint8 public decimals = 18;  
     uint256 public totalSupply;
     
   mapping (address => uint256) public balanceOf;
@@ -86,12 +87,12 @@ contract Indygo is owned {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function Indygo(
+    constructor(
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol,
         address centralMinter
-    ) Indygo(initialSupply, tokenName, tokenSymbol, centralMinter) public {
+    ) IntraCoin(initialSupply, tokenName, tokenSymbol, centralMinter) public {
         if(centralMinter != 0 ) owner = centralMinter;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
@@ -154,7 +155,7 @@ contract Indygo is owned {
      /**
      * Internal transfer, only can be called by this contract
      */
-    function _transfer(address _from, address _to, uint _value) internal {
+    function _transfer(address _from, address _to, uint _value) onlyOwner internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
         // Check if sending account is frozen
@@ -169,10 +170,10 @@ contract Indygo is owned {
         require(balanceOf[_to] + _value > balanceOf[_to]);
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        // Subtract from the sender
-        balanceOf[_from] -= _value;
-        // Add the same to the recipient
-        balanceOf[_to] += _value;
+        
+        balanceOf[_from] -= _value;   // Subtract from the sender
+        balanceOf[_to] += _value;     // Add the same to the recipient
+        
         emit Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
@@ -182,13 +183,13 @@ contract Indygo is owned {
   
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
       require(_to != address(0));
-       // Check if sending account is frozen
-        require(!frozenAccount[msg.sender]);
-        // Check if To account is frozen
-        require(!frozenAccount[_to]);
-    require(_value <= balanceOf[msg.sender]);
-    
+      require(!frozenAccount[msg.sender]);    // Check if sending account is frozen
+      require(!frozenAccount[_to]);           // Check if To account is frozen
+      require(_value <= balanceOf[msg.sender]);
+      require(balanceOf[_to] + _value > balanceOf[_to]);  //Check for overflows
+      
     _transfer(msg.sender, _to, _value);
+    
     
   }
     
@@ -204,6 +205,10 @@ contract Indygo is owned {
   function transferFrom(address _from, address _to, uint256 _value) public onlyOwner whenNotPaused returns (bool) {
     require(_to != address(0));
     require(_value <= balanceOf[_from]);     //Check if sender has enough
+    require(!frozenAccount[msg.sender]);     // Check if From account is frozen
+    require(!frozenAccount[_from]);          // Check if To account is frozen
+    require(!frozenAccount[_to]);            // Check if the sender has enough
+    require(balanceOf[_to] + _value > balanceOf[_to]);   //overflow check
 
     balanceOf[_from] -= _value;
     balanceOf[_to] += _value;
@@ -217,10 +222,9 @@ contract Indygo is owned {
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
    */
-  function burn(uint256 _value) public {
+  function burn(uint256 _value) onlyOwner public {
     require(_value <= balanceOf[msg.sender]);
-    // no need to require value <= totalSupply, since that would imply the
-    // sender's balance is greater than the totalSupply, which *should* be an assertion failure
+    require(_value <= totalSupply);
 
     address burner = msg.sender;
     balanceOf[burner] -= _value;
