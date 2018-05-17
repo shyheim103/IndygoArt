@@ -155,7 +155,7 @@ contract IntraCoin is owned {
      /**
      * Internal transfer, only can be called by this contract
      */
-    function _transfer(address _from, address _to, uint _value) onlyOwner internal {
+    function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
         // Check if sending account is frozen
